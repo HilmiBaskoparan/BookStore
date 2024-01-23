@@ -4,6 +4,7 @@ import com.baskoparan.BookStore.entity.Book;
 import com.baskoparan.BookStore.entity.MyBook;
 import com.baskoparan.BookStore.service.BookService;
 import com.baskoparan.BookStore.service.MyBookService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +15,11 @@ import java.util.List;
 @Controller
 public class BookController {
 
-    private final BookService bookService;
-    private final MyBookService myBookService;
+    @Autowired
+    private BookService bookService;
 
-    public BookController(BookService bookService, MyBookService myBookService) {
-        this.bookService = bookService;
-        this.myBookService = myBookService;
-    }
+    @Autowired
+    private MyBookService myBookService;
 
     @GetMapping("/")
     public String home() {
@@ -35,6 +34,9 @@ public class BookController {
     @GetMapping("/available_books")
     public ModelAndView getAllBooks() {
         List<Book> books = bookService.getAllBooks();
+//		ModelAndView m=new ModelAndView();
+//		m.setViewName("bookList");
+//		m.addObject("book",list);
         return new ModelAndView("bookList","book", books);
     }
 
@@ -51,8 +53,7 @@ public class BookController {
         model.addAttribute("book", myBooks);
         return "myBooks";
     }
-
-    @RequestMapping("/mybook/{id}")
+    @RequestMapping("/mylist/{id}")
     public String getMyList(@PathVariable("id") Long id) {
         Book book = bookService.getBookById(id);
         MyBook myBook = new MyBook(book.getId(), book.getCreatedDate(), book.getName(), book.getAuthor(), book.getPrice());
@@ -61,7 +62,7 @@ public class BookController {
     }
 
     @RequestMapping("/editBook/{id}")
-    public String editBook(@PathVariable("id") Long id,Model model) {
+    public String editBook(@PathVariable("id") Long id, Model model) {
         Book book = bookService.getBookById(id);
         model.addAttribute("book", book);
         return "bookEdit";
